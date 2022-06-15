@@ -1,4 +1,6 @@
 import * as express from 'express';
+import error from './middlewares/Errors';
+import loginRouter from './routes/Login.routes';
 
 class App {
   public app: express.Express;
@@ -19,12 +21,15 @@ class App {
     };
 
     this.app.use(accessControl);
-    // ...
+    this.app.use(express.json());
+    this.app.use(loginRouter);
+
+    this.app.use(error);
   }
 
   // ...
   public start(PORT: string | number):void {
-    this.app.listen(PORT);
+    this.app.listen(PORT, () => console.log(`Escutando na porta ${PORT}`));
   }
 }
 

@@ -5,7 +5,8 @@ import authenticateLogin from '../middlewares/Auth/authToken';
 
 const router: Router = Router();
 
-router.post('/login', validLogin, logInController);
-router.get('/login/validate', authenticateLogin, logInController);
+router
+  .post('/login', validLogin, logInController)
+  .get('/login/validate', authenticateLogin, logInController);
 
 export default router;

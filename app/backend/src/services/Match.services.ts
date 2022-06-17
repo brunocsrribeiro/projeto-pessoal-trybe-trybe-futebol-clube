@@ -29,4 +29,21 @@ const methodMatchesSearch = async (query: string): Promise<Match[]> => {
   return search;
 };
 
-export { methodMatchesAll, methodMatchesSearch };
+const methodCreatedMatches = async (matchData: IMatch): Promise<IMatch> => {
+  const createMatch = await Match.create(matchData);
+
+  return createMatch;
+};
+
+const finishMatch = async (id: number): Promise<void> => {
+  await Match.update({ inProgress: 0 }, { where: {
+    id,
+  } });
+};
+
+export {
+  methodMatchesAll,
+  methodMatchesSearch,
+  methodCreatedMatches,
+  finishMatch,
+};

@@ -2,7 +2,7 @@ import IMatch from '../interfaces/IMatch';
 import Match from '../database/models/match';
 import Team from '../database/models/team';
 
-const methodMatchesAll = async (): Promise<IMatch[]> => {
+const getAll = async (): Promise<IMatch[]> => {
   const match = await Match.findAll({
     include: [
       { model: Team, as: 'teamHome', attributes: { exclude: ['id'] } },
@@ -13,7 +13,7 @@ const methodMatchesAll = async (): Promise<IMatch[]> => {
   return match;
 };
 
-const methodMatchesSearch = async (query: string): Promise<Match[]> => {
+const getSearch = async (query: string): Promise<Match[]> => {
   const inProgress = query === 'true';
 
   const search = await Match.findAll({
@@ -29,10 +29,10 @@ const methodMatchesSearch = async (query: string): Promise<Match[]> => {
   return search;
 };
 
-const methodCreatedMatches = async (matchData: IMatch): Promise<IMatch> => {
-  const createMatch = await Match.create(matchData);
+const createMatch = async (matchData: IMatch): Promise<IMatch> => {
+  const created = await Match.create(matchData);
 
-  return createMatch;
+  return created;
 };
 
 const finishMatch = async (id: number): Promise<void> => {
@@ -42,8 +42,8 @@ const finishMatch = async (id: number): Promise<void> => {
 };
 
 export {
-  methodMatchesAll,
-  methodMatchesSearch,
-  methodCreatedMatches,
+  getAll,
+  getSearch,
+  createMatch,
   finishMatch,
 };

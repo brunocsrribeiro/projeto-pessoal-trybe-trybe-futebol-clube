@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
-import { StatusCodes } from 'http-status-codes';
+import { StatusCodes, getReasonPhrase } from 'http-status-codes';
 import { methodTeamId } from '../services/Team.services';
-import { getAll, getSearch, createMatch, finishMatch } from '../services/Match.services';
+import { getAll, getSearch, createMatch,
+  finishMatch, matchUpdate } from '../services/Match.services';
 
 const matchAll = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -45,9 +46,8 @@ const matchCreate = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const finish = async (req: Request, res: Response, next: NextFunction) => {
-  const { id } = req.params;
-
   try {
+    const { id } = req.params;
     await finishMatch(Number(id));
 
     return res.status(StatusCodes.OK).json({ message: 'Finished' });
@@ -56,4 +56,22 @@ const finish = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { matchAll, matchCreate, finish };
+const updateMatch = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const { homeTeamGoals, awayTeamGoals } = req.body;
+
+    await matchUpdate(
+      Number(homeTeamGoals),
+      Number(awayTeamGoals),
+      Number(id),
+    );
+
+    return res.status(StatusCodes.OK)
+      .json(getReasonPhrase(StatusCodes.OK));
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { matchAll, matchCreate, finish, updateMatch };

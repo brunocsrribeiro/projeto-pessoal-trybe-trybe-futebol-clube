@@ -4,7 +4,7 @@ import Match from '../database/models/match';
 const methodWins = (matches: Match[]) => {
   const wins = matches
     .reduce((acc, crr) => (
-      crr.homeTeamGoals > crr.awayTeamGoals ? acc + 1 : acc
+      crr.awayTeamGoals > crr.homeTeamGoals ? acc + 1 : acc
     ), 0);
   return wins;
 };
@@ -12,7 +12,7 @@ const methodWins = (matches: Match[]) => {
 const methodDraws = (matches: Match[]) => {
   const draws = matches
     .reduce((acc, crr) => (
-      crr.homeTeamGoals === crr.awayTeamGoals ? acc + 1 : acc
+      crr.awayTeamGoals === crr.homeTeamGoals ? acc + 1 : acc
     ), 0);
   return draws;
 };
@@ -20,7 +20,7 @@ const methodDraws = (matches: Match[]) => {
 const methodLosses = (matches: Match[]) => {
   const losses = matches
     .reduce((acc, crr) => (
-      crr.homeTeamGoals < crr.awayTeamGoals ? acc + 1 : acc
+      crr.awayTeamGoals < crr.homeTeamGoals ? acc + 1 : acc
     ), 0);
   return losses;
 };
@@ -28,7 +28,7 @@ const methodLosses = (matches: Match[]) => {
 const methodGoalsFavor = (matches: Match[]) => {
   const goalsFavor = matches
     .reduce((acc, crr) => (
-      crr.homeTeamGoals >= 0 ? acc + crr.homeTeamGoals : acc
+      crr.awayTeamGoals >= 0 ? acc + crr.awayTeamGoals : acc
     ), 0);
   return goalsFavor;
 };
@@ -48,7 +48,7 @@ const methodPoints = (win: number, draw: number) => {
 const methodGoalsOwn = (matches: Match[]) => {
   const goalsFavor = matches
     .reduce((acc, crr) => (
-      crr.awayTeamGoals >= 0 ? acc + crr.awayTeamGoals : acc
+      crr.homeTeamGoals >= 0 ? acc + crr.homeTeamGoals : acc
     ), 0);
   return goalsFavor;
 };
@@ -75,13 +75,13 @@ const leaderboardData = (matches: Match[]) => {
   };
 };
 
-const methodLeaderboard = async () => {
+const methodLeaderboardAway = async () => {
   const teams = await methodTeamsAll();
 
   const statistics = Promise.all(teams
     .map(async (team) => {
       const allMatchesTeam = await Match.findAll({ where: {
-        homeTeam: team.id,
+        awayTeam: team.id,
         inProgress: false,
       } });
 
@@ -99,4 +99,4 @@ const methodLeaderboard = async () => {
   });
 };
 
-export default methodLeaderboard;
+export default methodLeaderboardAway;

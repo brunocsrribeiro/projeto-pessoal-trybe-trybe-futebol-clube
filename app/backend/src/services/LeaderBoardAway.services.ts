@@ -1,57 +1,30 @@
 import { methodTeamsAll } from './Team.services';
 import Match from '../database/models/match';
 
-const methodWins = (matches: Match[]) => {
-  const wins = matches
-    .reduce((acc, crr) => (
-      crr.awayTeamGoals > crr.homeTeamGoals ? acc + 1 : acc
-    ), 0);
-  return wins;
-};
+const methodWins = (matches: Match[]) => matches
+  .reduce((acc, crr) => (
+    crr.awayTeamGoals > crr.homeTeamGoals ? acc + 1 : acc
+  ), 0);
 
-const methodDraws = (matches: Match[]) => {
-  const draws = matches
-    .reduce((acc, crr) => (
-      crr.awayTeamGoals === crr.homeTeamGoals ? acc + 1 : acc
-    ), 0);
-  return draws;
-};
+const methodDraws = (matches: Match[]) => matches
+  .reduce((acc, crr) => (
+    crr.awayTeamGoals === crr.homeTeamGoals ? acc + 1 : acc
+  ), 0);
 
-const methodLosses = (matches: Match[]) => {
-  const losses = matches
-    .reduce((acc, crr) => (
-      crr.awayTeamGoals < crr.homeTeamGoals ? acc + 1 : acc
-    ), 0);
-  return losses;
-};
+const methodLosses = (matches: Match[]) => matches
+  .reduce((acc, crr) => (
+    crr.awayTeamGoals < crr.homeTeamGoals ? acc + 1 : acc
+  ), 0);
 
-const methodGoalsFavor = (matches: Match[]) => {
-  const goalsFavor = matches
-    .reduce((acc, crr) => (
-      crr.awayTeamGoals >= 0 ? acc + crr.awayTeamGoals : acc
-    ), 0);
-  return goalsFavor;
-};
+const methodGoalsFavor = (matches: Match[]) => matches
+  .reduce((acc, crr) => acc + crr.awayTeamGoals, 0);
 
-const methodGames = (win: number, draw: number, loss: number) => {
-  const total = (win + draw + loss);
+const methodGames = (win: number, draw: number, loss: number) => (win + draw + loss);
 
-  return total;
-};
+const methodPoints = (win: number, draw: number) => ((win * 3) + (draw * 1));
 
-const methodPoints = (win: number, draw: number) => {
-  const total = ((win * 3) + (draw * 1));
-
-  return total;
-};
-
-const methodGoalsOwn = (matches: Match[]) => {
-  const goalsFavor = matches
-    .reduce((acc, crr) => (
-      crr.homeTeamGoals >= 0 ? acc + crr.homeTeamGoals : acc
-    ), 0);
-  return goalsFavor;
-};
+const methodGoalsOwn = (matches: Match[]) => matches
+  .reduce((acc, crr) => acc + crr.homeTeamGoals, 0);
 
 const leaderboardData = (matches: Match[]) => {
   const totalVictories = methodWins(matches);
@@ -78,7 +51,7 @@ const leaderboardData = (matches: Match[]) => {
 const methodLeaderboardAway = async () => {
   const teams = await methodTeamsAll();
 
-  const statistics = Promise.all(teams
+  const statistics = await Promise.all(teams
     .map(async (team) => {
       const allMatchesTeam = await Match.findAll({ where: {
         awayTeam: team.id,
@@ -89,14 +62,11 @@ const methodLeaderboardAway = async () => {
       return { name: team.teamName, ...finalNumbers };
     }));
 
-  return (await statistics).sort((a, b) => {
-    if (a.totalPoints !== b.totalPoints) return b.totalPoints - a.totalPoints;
-    if (a.totalVictories !== b.totalVictories) return b.totalVictories - a.totalVictories;
-    if (a.goalsBalance !== b.goalsBalance) return b.goalsBalance - a.goalsBalance;
-    if (a.goalsFavor !== b.goalsFavor) return b.goalsFavor - a.goalsFavor;
-    if (a.goalsOwn !== b.goalsOwn) return b.goalsOwn - a.goalsOwn;
-    return 0;
-  });
+  return statistics.sort((a, b) => b.totalPoints - a.totalPoints
+    || b.totalVictories - a.totalVictories
+    || b.goalsBalance - a.goalsBalance
+    || b.goalsFavor - a.goalsFavor
+    || a.goalsOwn - b.goalsOwn);
 };
 
 export default methodLeaderboardAway;

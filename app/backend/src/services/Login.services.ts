@@ -10,9 +10,7 @@ const secretKey: jwt.Secret = fs.readFileSync('jwt.evaluation.key', 'utf-8');
 const methodLogInService = async (userData: ILogin) => {
   const user = await User.findOne({ where: { email: userData.email } });
 
-  if (!user) throw new Error('User not exist');
-
-  const verifyPassword = Bcrypt.compareSync(userData.password, user.password);
+  const verifyPassword = Bcrypt.compareSync(userData.password, user?.password || '');
 
   if (verifyPassword) {
     const token: string = jwt.sign({ userData: user }, secretKey, jwtConfig);
